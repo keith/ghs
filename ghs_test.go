@@ -27,12 +27,20 @@ func TestSearchString(t *testing.T) {
 	tests := []struct {
 		q   Query
 		out string
+		err bool
 	}{
-		{Query{"", "", 5}, ""},
+		{Query{"", "", 0}, "", true},
+		{Query{"foo", "", 0}, baseURL + "?q=foo" + helpers + "10", false},
+		{Query{"foo bar", "", 0}, baseURL + "?q=foo+bar" + helpers + "10", false},
+		{Query{"bar baz", "go", 0}, baseURL + "?q=bar+baz+language:go" + helpers + "10", false},
 	}
 
 	for _, test := range tests {
-		res := searchString(test.q)
+		res, err := searchString(test.q)
+		if test.err != (err != nil) {
+			t.Errorf("Expected error to be (%t) got text (%s) for (%+v)", test.err, err.Error(), test.q)
+		}
+
 		if res != test.out {
 			t.Errorf("Expected (%s) for (%+v) got (%s)", test.out, test.q, res)
 		}

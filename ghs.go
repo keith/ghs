@@ -10,6 +10,7 @@ import (
 )
 
 const baseURL = "https://api.github.com/search/repositories"
+const helpers = "&sort=stars&order=desc&page=1&per_page="
 
 type Query struct {
 	Q string
@@ -25,14 +26,26 @@ func searchString(q Query) (string, error) {
 	var buffer bytes.Buffer
 	buffer.WriteString(baseURL)
 
-	fmt.Println(q)
 	if q.Q == "" {
 		return "", errors.New("You must enter a search query")
 	}
 
 	query := fmt.Sprintf("?q=%s", escapeSearch(q.Q))
 	buffer.WriteString(query)
-	// return fmt.Sprintf("%s?q=%s+language:assembly&sort=stars&order=desc", baseURL, q)
+
+	if q.Lang != "" {
+		lang := fmt.Sprintf("+language:%s", q.Lang)
+		buffer.WriteString(lang)
+	}
+
+	limit := 10
+	if q.Limit > 0 {
+		limit = q.Limit
+	}
+
+	other := fmt.Sprintf("%s%d", helpers, limit)
+	buffer.WriteString(other)
+
 	return buffer.String(), nil
 }
 

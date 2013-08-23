@@ -29,10 +29,11 @@ func TestSearchString(t *testing.T) {
 		out string
 		err bool
 	}{
-		{Query{"", "", 0}, "", true},
-		{Query{"foo", "", 0}, baseURL + "?q=foo" + helpers + "10", false},
-		{Query{"foo bar", "", 0}, baseURL + "?q=foo+bar" + helpers + "10", false},
-		{Query{"bar baz", "go", 0}, baseURL + "?q=bar+baz+language:go" + helpers + "10", false},
+		{Query{"", "", 0}, "", true}, // Test empty error
+		{Query{"foo", "", 0}, baseURL + "?q=foo" + helpers + "10", false}, // Test single query
+		{Query{"foo bar", "", 0}, baseURL + "?q=foo+bar" + helpers + "10", false}, // Test spaced query
+		{Query{"bar baz", "go", 0}, baseURL + "?q=bar+baz+language:go" + helpers + "10", false}, // Test spaced and language
+		{Query{"baz qux", "objc", 5}, baseURL + "?q=baz+qux+language:objc" + helpers + "5", false}, // Test custom number
 	}
 
 	for _, test := range tests {

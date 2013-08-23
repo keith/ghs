@@ -1,12 +1,14 @@
 package main
 
 import (
+	"flag"
 	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"os"
 )
 
 const baseURL = "https://api.github.com/search/repositories"
@@ -59,6 +61,31 @@ func requestSearch(url string, client http.Client) (r *http.Response, e error) {
 	return client.Do(res)
 }
 
-func main() {
-	fmt.Println(searchString(Query{"foo bar", "", 0}))
+var Usage = func() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [options] query\n", os.Args[0])
+	flag.PrintDefaults()
+	os.Exit(2)
 }
+
+var count int
+const countDefault = 10
+const countHelp = "The number of results to return"
+var query string
+func main() {
+	flag.Usage = Usage
+	flag.IntVar(&count, "count", countDefault, countHelp)
+	flag.IntVar(&count, "c", countDefault, countHelp + " (shorthand)")
+	flag.Parse()
+
+	if flag.NArg() == 0 {
+		flag.PrintDefaults()
+	}
+	url, err := searchString(Query{query, "", count})
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Println(url)
+}
+

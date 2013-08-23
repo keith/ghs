@@ -10,19 +10,26 @@ import (
 
 const baseURL = "https://api.github.com/search/repositories"
 
+type Query struct {
+	Q string
+	Lang string
+	Limit int
+}
+
 func escapeSearch(s string) string {
 	return strings.Replace(s, " ", "+", -1)
 }
 
-func searchString(q string, lang string, limit int) string {
+func searchString(q Query) string {
 	var buffer bytes.Buffer
 	buffer.WriteString(baseURL)
 
-	if q == "" {
+	fmt.Println(q)
+	if q.Q == "" {
 		log.Fatal("You must enter a search query")
 	}
 
-	query := fmt.Sprintf("?q=%s", escapeSearch(q))
+	query := fmt.Sprintf("?q=%s", escapeSearch(q.Q))
 	buffer.WriteString(query)
 	// return fmt.Sprintf("%s?q=%s+language:assembly&sort=stars&order=desc", baseURL, q)
 	return buffer.String()
@@ -39,5 +46,5 @@ func requestSearch(url string, client http.Client) (r *http.Response, e error) {
 }
 
 func main() {
-	fmt.Println(searchString("foo bar", "", 0))
+	fmt.Println(searchString(Query{"foo bar", "", 0}))
 }

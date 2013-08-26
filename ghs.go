@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"os"
+	"io/ioutil"
 )
 
 const baseURL = "https://api.github.com/search/repositories"
@@ -51,7 +52,7 @@ func searchString(q Query) (string, error) {
 	return buffer.String(), nil
 }
 
-func requestSearch(url string, client http.Client) (r *http.Response, e error) {
+func requestSearch(url string, client *http.Client) (r *http.Response, e error) {
 	res, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -70,22 +71,38 @@ var Usage = func() {
 var count int
 const countDefault = 10
 const countHelp = "The number of results to return"
-var query string
+var lang string
+const langHelp = "The language of the repo"
+
 func main() {
 	flag.Usage = Usage
 	flag.IntVar(&count, "count", countDefault, countHelp)
 	flag.IntVar(&count, "c", countDefault, countHelp + " (shorthand)")
+	flag.StringVar(&lang, "language", "", langHelp)
+	flag.StringVar(&lang, "l", "", langHelp + "(shorthand)")
 	flag.Parse()
 
-	if flag.NArg() == 0 {
+	if flag.NArg() == 0 || flag.NArg() > 1 {
 		flag.PrintDefaults()
+		return
 	}
-	url, err := searchString(Query{query, "", count})
+
+	query := flag.Arg(0)
+	url, err := searchString(Query{query, lang, count})
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	fmt.Println(url)
+	client := &http.Client{}
+	res, err := requestSearch(url, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	buffer, e := ioutil.ReadAll(res.Body)
+	if e != nil {
+		log.Fatal(e)
+	}
 }
 

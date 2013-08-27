@@ -58,6 +58,11 @@ func repoString(u string, s int, l string) string {
 	starLen := utf8.RuneCountInString(strconv.Itoa(s))
 	langLen := utf8.RuneCountInString(l)
 
+	// If the terminal has no width return an unformatted string
+	if w < 1 {
+		return fmt.Sprintf("%s %d %s\n", url, s, l)
+	}
+
 	spaceLen := w - urlLen - starLen - langLen - 1
 	if spaceLen < 1 {
 		spaceLen := w - starLen - langLen - 1

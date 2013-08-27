@@ -39,7 +39,8 @@ AFNetworking/AFNetworking                                                      8
 AFNetworking/AFIncrementalStore                                                1413 Objective-C
 ```
 
-Search for a repo written in [Go](http://golang.org/)
+Search for a repo written in [Go](http://golang.org/) matching
+`postgres`
 
 ```
 $ ghs -lang=Go postgres

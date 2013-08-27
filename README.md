@@ -5,7 +5,9 @@ API](http://developer.github.com/v3/search/)
 
 ## Installation
 
-
+```
+go install github.com/Keithbsmiley/ghs
+```
 
 ## Usage
 

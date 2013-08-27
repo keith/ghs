@@ -125,7 +125,7 @@ func main() {
 	flag.Usage = Usage
 	flag.IntVar(&count, "count", countDefault, countHelp)
 	flag.IntVar(&count, "c", countDefault, countHelp+" (shorthand)")
-	flag.StringVar(&langNum, "language", "", langHelp)
+	flag.StringVar(&langNum, "lang", "", langHelp)
 	flag.StringVar(&langNum, "l", "", langHelp+"(shorthand)")
 	flag.Parse()
 

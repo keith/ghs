@@ -91,6 +91,10 @@ func printFromJSON(n int, b []byte) error {
 		return err
 	}
 
+	if j == nil {
+		return errors.New("No matching repositories")
+	}
+
 	items := j["items"].([]interface{})
 	if len(items) < 1 {
 		return errors.New("No matching repositories")

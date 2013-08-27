@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	"strings"
 	"strconv"
+	"strings"
+	"testing"
 )
 
 func TestEscapeSearch(t *testing.T) {
@@ -31,10 +31,10 @@ func TestSearchString(t *testing.T) {
 		out string
 		err bool
 	}{
-		{Query{"", "", 0}, "", true}, // Test empty error
-		{Query{"foo", "", 0}, baseURL + "?q=foo" + helpers + "0", false}, // Test single query
-		{Query{"foo bar", "", 1}, baseURL + "?q=foo+bar" + helpers + "1", false}, // Test spaced query
-		{Query{"bar baz", "go", 2}, baseURL + "?q=bar+baz+language:go" + helpers + "2", false}, // Test spaced and language
+		{Query{"", "", 0}, "", true},                                                               // Test empty error
+		{Query{"foo", "", 0}, baseURL + "?q=foo" + helpers + "0", false},                           // Test single query
+		{Query{"foo bar", "", 1}, baseURL + "?q=foo+bar" + helpers + "1", false},                   // Test spaced query
+		{Query{"bar baz", "go", 2}, baseURL + "?q=bar+baz+language:go" + helpers + "2", false},     // Test spaced and language
 		{Query{"baz qux", "objc", 5}, baseURL + "?q=baz+qux+language:objc" + helpers + "5", false}, // Test custom number
 	}
 
@@ -52,10 +52,10 @@ func TestSearchString(t *testing.T) {
 
 func TestRepoString(t *testing.T) {
 	tests := []struct {
-		url string
+		url   string
 		stars int
-		lang string
-		name string
+		lang  string
+		name  string
 	}{
 		{"https://github.com/foo/bar", 10, "C", "foo/bar"},
 		{"othersite.com/foo/bar", 12, "C++", "othersite.com/foo/bar"},
@@ -66,8 +66,8 @@ func TestRepoString(t *testing.T) {
 		fields := strings.Fields(str)
 		if len(fields) < 1 {
 			t.Errorf("Expected fields from (%+v)", test)
-		} 
-		
+		}
+
 		if fields[0] != test.name {
 			t.Errorf("Expected (%s) got (%s) for (%+v)", test.name, fields[0], test)
 		}

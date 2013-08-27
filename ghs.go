@@ -1,23 +1,27 @@
 package main
 
 import (
-	"flag"
 	"bytes"
+	"code.google.com/p/go.crypto/ssh/terminal"
+	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"os"
-	"io/ioutil"
+	"strconv"
+	"strings"
+	"unicode/utf8"
 )
 
 const baseURL = "https://api.github.com/search/repositories"
 const helpers = "&sort=stars&order=desc&page=1&per_page="
 
 type Query struct {
-	Q string
-	Lang string
+	Q     string
+	Lang  string
 	Limit int
 }
 
@@ -68,18 +72,67 @@ var Usage = func() {
 	os.Exit(2)
 }
 
+func printFromJSON(n int, b []byte) error {
+	var j map[string]interface{}
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return err
+	}
+
+	items := j["items"].([]interface{})
+	if len(items) < 1 {
+		return errors.New("No matching repositories")
+	}
+
+	if len(items) < n {
+		n = len(items)
+	}
+
+	for i := 0; i < n; i++ {
+		repo := items[i].(map[string]interface{})
+		// name := repo["name"].(string)
+		url := repo["html_url"].(string)
+		stars := int(repo["watchers"].(float64))
+		lang := repo["language"].(string)
+		fmt.Print(repoString(url, stars, lang))
+	}
+
+	return nil
+}
+
+func repoString(u string, s int, l string) string {
+	url := strings.TrimPrefix(u, "https://github.com/")
+	w, _, _ := terminal.GetSize(0)
+	urlLen := utf8.RuneCountInString(url)
+	starLen := utf8.RuneCountInString(strconv.Itoa(s))
+	langLen := utf8.RuneCountInString(l)
+
+	spaceLen := w - urlLen - starLen - langLen - 1
+	if spaceLen < 1 {
+		spaceLen := w - starLen - langLen - 1
+		spaces := strings.Repeat(" ", spaceLen)
+		return fmt.Sprintf("%s\n%s%d %s\n", url, spaces, s, l)
+	}
+
+	spaces := strings.Repeat(" ", spaceLen)
+	return fmt.Sprintf("%s%s%d %s\n", url, spaces, s, l)
+}
+
 var count int
+
 const countDefault = 10
 const countHelp = "The number of results to return"
+
 var lang string
+
 const langHelp = "The language of the repo"
 
 func main() {
 	flag.Usage = Usage
 	flag.IntVar(&count, "count", countDefault, countHelp)
-	flag.IntVar(&count, "c", countDefault, countHelp + " (shorthand)")
+	flag.IntVar(&count, "c", countDefault, countHelp+" (shorthand)")
 	flag.StringVar(&lang, "language", "", langHelp)
-	flag.StringVar(&lang, "l", "", langHelp + "(shorthand)")
+	flag.StringVar(&lang, "l", "", langHelp+"(shorthand)")
 	flag.Parse()
 
 	if flag.NArg() == 0 || flag.NArg() > 1 {
@@ -100,9 +153,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	buffer, e := ioutil.ReadAll(res.Body)
-	if e != nil {
-		log.Fatal(e)
+	buffer, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = printFromJSON(count, buffer)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
-

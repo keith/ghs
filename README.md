@@ -8,6 +8,7 @@ API](http://developer.github.com/v3/search/)
 ## Installation
 
 ```
+go get github.com/Keithbsmiley/ghs
 go install github.com/Keithbsmiley/ghs
 ```
 

@@ -45,12 +45,7 @@ func searchString(q Query) (string, error) {
 		buffer.WriteString(lang)
 	}
 
-	limit := 10
-	if q.Limit > 0 {
-		limit = q.Limit
-	}
-
-	other := fmt.Sprintf("%s%d", helpers, limit)
+	other := fmt.Sprintf("%s%d", helpers, q.Limit)
 	buffer.WriteString(other)
 
 	return buffer.String(), nil
@@ -66,12 +61,6 @@ func requestSearch(url string, client *http.Client) (r *http.Response, e error) 
 	return client.Do(res)
 }
 
-var Usage = func() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [options] query\n", os.Args[0])
-	flag.PrintDefaults()
-	os.Exit(2)
-}
-
 func printFromJSON(n int, b []byte) error {
 	var j map[string]interface{}
 	err := json.Unmarshal(b, &j)
@@ -84,11 +73,7 @@ func printFromJSON(n int, b []byte) error {
 		return errors.New("No matching repositories")
 	}
 
-	if len(items) < n {
-		n = len(items)
-	}
-
-	for i := 0; i < n; i++ {
+	for i := 0; i < len(items); i++ {
 		repo := items[i].(map[string]interface{})
 		// name := repo["name"].(string)
 		url := repo["html_url"].(string)
@@ -119,32 +104,34 @@ func repoString(u string, s int, l string) string {
 }
 
 var count int
+var langNum string
 
 const countDefault = 10
 const countHelp = "The number of results to return"
-
-var lang string
-
 const langHelp = "The language of the repo"
+
+var Usage = func() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [options] query\n", os.Args[0])
+	flag.PrintDefaults()
+	os.Exit(2)
+}
 
 func main() {
 	flag.Usage = Usage
 	flag.IntVar(&count, "count", countDefault, countHelp)
 	flag.IntVar(&count, "c", countDefault, countHelp+" (shorthand)")
-	flag.StringVar(&lang, "language", "", langHelp)
-	flag.StringVar(&lang, "l", "", langHelp+"(shorthand)")
+	flag.StringVar(&langNum, "language", "", langHelp)
+	flag.StringVar(&langNum, "l", "", langHelp+"(shorthand)")
 	flag.Parse()
 
 	if flag.NArg() == 0 || flag.NArg() > 1 {
-		flag.PrintDefaults()
-		return
+		flag.Usage()
 	}
 
 	query := flag.Arg(0)
-	url, err := searchString(Query{query, lang, count})
+	url, err := searchString(Query{query, langNum, count})
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		log.Fatal(err)
 	}
 
 	client := &http.Client{}

@@ -51,6 +51,24 @@ func searchString(q Query) (string, error) {
 	return buffer.String(), nil
 }
 
+func repoString(u string, s int, l string) string {
+	url := strings.TrimPrefix(u, "https://github.com/")
+	w, _, _ := terminal.GetSize(0)
+	urlLen := utf8.RuneCountInString(url)
+	starLen := utf8.RuneCountInString(strconv.Itoa(s))
+	langLen := utf8.RuneCountInString(l)
+
+	spaceLen := w - urlLen - starLen - langLen - 1
+	if spaceLen < 1 {
+		spaceLen := w - starLen - langLen - 1
+		spaces := strings.Repeat(" ", spaceLen)
+		return fmt.Sprintf("%s\n%s%d %s\n", url, spaces, s, l)
+	}
+
+	spaces := strings.Repeat(" ", spaceLen)
+	return fmt.Sprintf("%s%s%d %s\n", url, spaces, s, l)
+}
+
 func requestSearch(url string, client *http.Client) (r *http.Response, e error) {
 	res, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -83,24 +101,6 @@ func printFromJSON(n int, b []byte) error {
 	}
 
 	return nil
-}
-
-func repoString(u string, s int, l string) string {
-	url := strings.TrimPrefix(u, "https://github.com/")
-	w, _, _ := terminal.GetSize(0)
-	urlLen := utf8.RuneCountInString(url)
-	starLen := utf8.RuneCountInString(strconv.Itoa(s))
-	langLen := utf8.RuneCountInString(l)
-
-	spaceLen := w - urlLen - starLen - langLen - 1
-	if spaceLen < 1 {
-		spaceLen := w - starLen - langLen - 1
-		spaces := strings.Repeat(" ", spaceLen)
-		return fmt.Sprintf("%s\n%s%d %s\n", url, spaces, s, l)
-	}
-
-	spaces := strings.Repeat(" ", spaceLen)
-	return fmt.Sprintf("%s%s%d %s\n", url, spaces, s, l)
 }
 
 var count int

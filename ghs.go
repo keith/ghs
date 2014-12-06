@@ -80,7 +80,7 @@ func requestSearch(url string, client *http.Client) (r *http.Response, e error) 
 		log.Fatal(err)
 	}
 
-	res.Header.Set("Accept", "application/vnd.github.preview")
+	res.Header.Set("Accept", "application/vnd.github.v3+json")
 	return client.Do(res)
 }
 
@@ -105,7 +105,12 @@ func printFromJSON(n int, b []byte) error {
 		// name := repo["name"].(string)
 		url := repo["html_url"].(string)
 		stars := int(repo["watchers"].(float64))
-		lang := repo["language"].(string)
+		language := repo["language"]
+		lang := "Unknown"
+		if language != nil {
+			lang = language.(string)
+		}
+
 		fmt.Print(repoString(url, stars, lang))
 	}
 
@@ -156,6 +161,6 @@ func main() {
 
 	err = printFromJSON(count, buffer)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }

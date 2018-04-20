@@ -3,12 +3,12 @@
 ghs is a simple tool for searching Github repos using their [Search
 API](http://developer.github.com/v3/search/)
 
-[![Build Status](https://travis-ci.org/Keithbsmiley/ghs.png?branch=master)](https://travis-ci.org/Keithbsmiley/ghs)
+[![Build Status](https://travis-ci.org/keith/ghs.png?branch=master)](https://travis-ci.org/keith/ghs)
 
 ## Installation
 
 ```
-go get github.com/Keithbsmiley/ghs
+go get github.com/keith/ghs
 ```
 
 ## Usage

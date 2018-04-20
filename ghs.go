@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/go.crypto/ssh/terminal"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"log"
 	"net/http"
